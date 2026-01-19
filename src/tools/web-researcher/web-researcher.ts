@@ -48,7 +48,7 @@ export const webResearcher = async () => {
         await fs.writeFile(filepath, markdown);
 
         console.log(
-          chalk.cyan(`\n${safeTitle}.md 파일이 성공적으로 저장되었습니다.`),
+          chalk.cyan(`\n${safeTitle}.md 파일이 성공적으로 저장되었습니다.\n`),
         );
       }),
     ]);
