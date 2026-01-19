@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Markdown Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: #f5f5f5;
+        padding: 20px;
+        transition: background-color 0.3s ease;
+      }
+
+      body.dark-mode {
+        background: #1a1a1a;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition:
+          background-color 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+
+      .dark-mode .container {
+        background: #2d2d2d;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      }
+
+      .header {
+        background: #2c3e50;
+        color: white;
+        padding: 20px 30px;
+        border-bottom: 3px solid #3498db;
+        transition: background-color 0.3s ease;
+      }
+
+      .dark-mode .header {
+        background: #1a252f;
+        border-bottom: 3px solid #2980b9;
+      }
+
+      .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+        margin: 0;
+      }
+
+      .theme-toggle {
+        background: #3498db;
+        border: none;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background-color 0.3s ease;
+      }
+
+      .theme-toggle:hover {
+        background: #2980b9;
+      }
+
+      .dark-mode .theme-toggle {
+        background: #2980b9;
+      }
+
+      .dark-mode .theme-toggle:hover {
+        background: #3498db;
+      }
+
+      .file-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      input[type="file"] {
+        padding: 8px 12px;
+        border: 2px solid #3498db;
+        border-radius: 4px;
+        background: white;
+        color: #2c3e50;
+        cursor: pointer;
+        font-size: 14px;
+        transition:
+          background-color 0.3s ease,
+          border-color 0.3s ease;
+      }
+
+      .dark-mode input[type="file"] {
+        background: #3d3d3d;
+        color: #e0e0e0;
+        border-color: #2980b9;
+      }
+
+      input[type="file"]::file-selector-button {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 10px;
+        transition: background-color 0.3s ease;
+      }
+
+      input[type="file"]::file-selector-button:hover {
+        background: #2980b9;
+      }
+
+      .content {
+        padding: 40px;
+        min-height: 400px;
+        transition: background-color 0.3s ease;
+      }
+
+      .placeholder {
+        text-align: center;
+        color: #7f8c8d;
+        padding: 60px 20px;
+        transition: color 0.3s ease;
+      }
+
+      .dark-mode .placeholder {
+        color: #95a5a6;
+      }
+
+      .placeholder svg {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+      }
+
+      #markdown-content {
+        line-height: 1.6;
+        color: #333;
+        transition: color 0.3s ease;
+      }
+
+      .dark-mode #markdown-content {
+        color: #e0e0e0;
+      }
+
+      #markdown-content h1 {
+        font-size: 2em;
+        margin-top: 0.67em;
+        margin-bottom: 0.67em;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 0.3em;
+        transition: border-color 0.3s ease;
+      }
+
+      .dark-mode #markdown-content h1 {
+        border-bottom-color: #404040;
+      }
+
+      #markdown-content h2 {
+        font-size: 1.5em;
+        margin-top: 0.83em;
+        margin-bottom: 0.83em;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 0.3em;
+        transition: border-color 0.3s ease;
+      }
+
+      .dark-mode #markdown-content h2 {
+        border-bottom-color: #404040;
+      }
+
+      #markdown-content h3 {
+        font-size: 1.17em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+      }
+
+      #markdown-content p {
+        margin-bottom: 1em;
+      }
+
+      #markdown-content code {
+        background: #f4f4f4;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
+      }
+
+      .dark-mode #markdown-content code {
+        background: #3d3d3d;
+        color: #e0e0e0;
+      }
+
+      #markdown-content pre {
+        background: #f4f4f4;
+        padding: 15px;
+        border-radius: 5px;
+        overflow-x: auto;
+        margin-bottom: 1em;
+        transition: background-color 0.3s ease;
+      }
+
+      .dark-mode #markdown-content pre {
+        background: #3d3d3d;
+      }
+
+      #markdown-content pre code {
+        background: none;
+        padding: 0;
+      }
+
+      #markdown-content blockquote {
+        border-left: 4px solid #3498db;
+        padding-left: 15px;
+        margin: 1em 0;
+        color: #666;
+        transition:
+          color 0.3s ease,
+          border-color 0.3s ease;
+      }
+
+      .dark-mode #markdown-content blockquote {
+        border-left-color: #2980b9;
+        color: #b0b0b0;
+      }
+
+      #markdown-content ul,
+      #markdown-content ol {
+        margin-left: 2em;
+        margin-bottom: 1em;
+      }
+
+      #markdown-content li {
+        margin-bottom: 0.5em;
+      }
+
+      #markdown-content a {
+        color: #3498db;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .dark-mode #markdown-content a {
+        color: #5dade2;
+      }
+
+      #markdown-content a:hover {
+        text-decoration: underline;
+      }
+
+      #markdown-content img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      #markdown-content table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 1em;
+      }
+
+      #markdown-content th,
+      #markdown-content td {
+        border: 1px solid #ddd;
+        padding: 8px 12px;
+        text-align: left;
+        transition:
+          border-color 0.3s ease,
+          background-color 0.3s ease;
+      }
+
+      .dark-mode #markdown-content th,
+      .dark-mode #markdown-content td {
+        border-color: #404040;
+      }
+
+      #markdown-content th {
+        background: #f4f4f4;
+        font-weight: bold;
+      }
+
+      .dark-mode #markdown-content th {
+        background: #3d3d3d;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="header-top">
+          <h1>📝 Markdown Viewer</h1>
+          <button class="theme-toggle" id="themeToggle">
+            <span id="themeIcon">🌙</span>
+            <span id="themeText">Dark Mode</span>
+          </button>
+        </div>
+        <div class="file-input-wrapper">
+          <input type="file" id="fileInput" accept=".md,.markdown" />
+        </div>
+      </div>
+      <div class="content">
+        <div class="placeholder" id="placeholder">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <h2>마크다운 파일을 선택해주세요</h2>
+          <p>위의 버튼을 클릭하여 .md 파일을 불러오세요</p>
+        </div>
+        <div id="markdown-content" style="display: none"></div>
+      </div>
+    </div>
+
+    <script>
+      const fileInput = document.getElementById("fileInput");
+      const placeholder = document.getElementById("placeholder");
+      const markdownContent = document.getElementById("markdown-content");
+      const themeToggle = document.getElementById("themeToggle");
+      const themeIcon = document.getElementById("themeIcon");
+      const themeText = document.getElementById("themeText");
+
+      // 저장된 테마 불러오기
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+        themeIcon.textContent = "☀️";
+        themeText.textContent = "Light Mode";
+      }
+
+      // 테마 토글
+      themeToggle.addEventListener("click", function () {
+        document.body.classList.toggle("dark-mode");
+        const isDarkMode = document.body.classList.contains("dark-mode");
+
+        if (isDarkMode) {
+          themeIcon.textContent = "☀️";
+          themeText.textContent = "Light Mode";
+          localStorage.setItem("theme", "dark");
+        } else {
+          themeIcon.textContent = "🌙";
+          themeText.textContent = "Dark Mode";
+          localStorage.setItem("theme", "light");
+        }
+      });
+
+      fileInput.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+
+        if (!file) {
+          return;
+        }
+
+        if (!file.name.endsWith(".md") && !file.name.endsWith(".markdown")) {
+          alert("마크다운 파일(.md 또는 .markdown)만 선택할 수 있습니다.");
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+          const markdown = event.target.result;
+          const html = marked.parse(markdown);
+
+          markdownContent.innerHTML = html;
+          placeholder.style.display = "none";
+          markdownContent.style.display = "block";
+        };
+
+        reader.onerror = function () {
+          alert("파일을 읽는 중 오류가 발생했습니다.");
+        };
+
+        reader.readAsText(file);
+      });
+    </script>
+  </body>
+</html>
