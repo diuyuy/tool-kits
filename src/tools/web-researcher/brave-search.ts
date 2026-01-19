@@ -26,5 +26,7 @@ export const braveSearch = async (query: string) => {
     throw new Error(errorData.errors[0]?.detail ?? "Brave Search Error");
   }
 
-  return (await response.json()) as BraveSearchResult;
+  const responseData = (await response.json()) as BraveSearchResult;
+
+  return responseData;
 };

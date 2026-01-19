@@ -3,13 +3,14 @@ import TurndownService from "turndown";
 
 export const scrapeToMarkdown = async (url: string) => {
   const browser = await chromium.launch({
-    timeout: 10000,
+    timeout: 30000,
   });
   const page = await browser.newPage();
 
   try {
     await page.goto(url, {
       waitUntil: "networkidle",
+      timeout: 30000,
     });
 
     // Playwright API로 요소 제거 (TypeScript 에러 없음)
