@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@types/turndown": "^5.0.6",
+    "@types/xml2js": "^0.4.14",
     "tsx": "^4.21.0"
   },
   "peerDependencies": {
@@ -23,6 +24,7 @@
     "ora": "^9.0.0",
     "playwright": "^1.57.0",
     "turndown": "^7.2.2",
+    "xml2js": "^0.6.2",
     "zod": "^4.3.5"
   }
 }

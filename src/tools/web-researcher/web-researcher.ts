@@ -3,8 +3,8 @@ import chalk from "chalk";
 import fs from "fs/promises";
 import ora from "ora";
 import path from "path";
+import { sanitizeFilename } from "../../utils/sanitize-file-name.js";
 import { braveSearch } from "./brave-search.js";
-import { sanitizeFilename } from "./sanitize-file-name.js";
 import { scrapeToMarkdown } from "./scrape-to-markdown.js";
 
 export const webResearcher = async () => {
