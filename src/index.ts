@@ -1,6 +1,6 @@
 import { confirm, select } from "@inquirer/prompts";
 import { config } from "dotenv";
-import { WEB_RESEARCHER, WEB_SCRAPPER } from "./constants.js";
+import { ARXIV_API, WEB_RESEARCHER, WEB_SCRAPPER } from "./constants.js";
 import { toolExecutor, type ToolName } from "./tools/tool-executor.js";
 
 config();
@@ -20,6 +20,11 @@ async function run() {
             name: WEB_RESEARCHER,
             value: WEB_RESEARCHER,
             description: "웹 리서치 도구",
+          },
+          {
+            name: ARXIV_API,
+            value: ARXIV_API,
+            description: "Arixv API",
           },
         ],
       });
